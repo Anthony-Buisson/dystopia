@@ -39,7 +39,8 @@
   --q: 22px;            /* one grid row = 15 min */
   color-scheme: dark;
 }
-html { background: var(--bg); }
+/* clip, not hidden: the day swipe animation must not widen the page, or Safari zooms out */
+html { background: var(--bg); overflow-x: clip; }
 body {
   margin: 0;
   min-height: 100vh;
@@ -48,7 +49,7 @@ body {
   font-weight: 500;
   background: var(--bg);
   -webkit-tap-highlight-color: transparent;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 /* Jungle, neon wireframe ceiling and the cube's golden light, like the flyer. Fixed so the columns scroll over it. */
 body::before {
@@ -284,7 +285,7 @@ footer details { width: 100%; max-width: 440px; }
 footer summary { cursor: pointer; text-transform: uppercase; letter-spacing: .14em; }
 footer summary.on { color: var(--neon); }
 .simrow { display: flex; gap: 8px; justify-content: center; align-items: center; margin-top: 10px; flex-wrap: wrap; }
-.simrow input, .simrow select { font: inherit; font-size: 15px; color: var(--ink); background: #0d1510; border: 1px solid var(--line); padding: 6px 8px; border-radius: 4px; }
+.simrow input, .simrow select { font: inherit; font-size: 16px; color: var(--ink); background: #0d1510; border: 1px solid var(--line); padding: 6px 8px; border-radius: 4px; }
 [hidden], .sheet .members:empty, .tags:empty { display: none !important; }
 
 @media (max-width: 420px) {
