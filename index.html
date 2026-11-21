@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Dystopia Timetable</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Timetable de Dystopia Saint-Étienne, vendredi 5 et samedi 6 décembre, avec les artistes en train de jouer.">
 <meta name="theme-color" content="#060a08">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,6 +15,16 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<script>
+// Light access-code gate: keeps casual visitors and search engines out, not a real protection (the data stays in the page).
+// A plain text field, not a password one, so password managers do not take the page for a login form (phishing alerts).
+const GATE_KEY = "dystopia-acces", GATE_HASH = "41f863e0662165c6f985caaacb8de0bdc14b18fb17c7d76dd7301a4a0a50077a";
+// The installed app never asks (on iPhone it does not share Safari's storage); in the browser the password is asked once.
+const installed = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+let unlocked = installed;
+try { unlocked = unlocked || localStorage.getItem(GATE_KEY) === GATE_HASH; } catch (e) {}
+if (!unlocked) document.documentElement.classList.add("locked");
+</script>
 <style>
 @font-face { font-family: "Oswald"; src: url(fonts/oswald.woff2) format("woff2"); font-weight: 200 700; font-display: swap; }
 @font-face { font-family: "Teko"; src: url(fonts/teko.woff2) format("woff2"); font-weight: 400 700; font-display: swap; }
@@ -266,6 +277,23 @@ dialog::backdrop { background: rgba(0, 0, 0, .7); backdrop-filter: blur(2px); }
 .install svg { width: 18px; height: 18px; flex: none; margin-top: -3px; }
 .install:active { transform: translateY(2px); }
 .install:focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
+/* Access-code gate: the lit cube over the poster title, a white-framed field and the white pill to enter */
+.gate { display: none; }
+html.locked .gate { display: grid; place-items: center; min-height: 100vh; min-height: 100dvh; padding: 24px 16px; position: relative; z-index: 1; }
+html.locked .gate ~ *, html.locked body > :not(.gate) { display: none !important; }
+.gate form { display: grid; gap: 14px; justify-items: center; width: min(320px, 100%); text-align: center; }
+.gate .cube {
+  width: 96px; height: 96px; overflow: visible;
+  --f-top: #fff1c2; --f-left: #d9b766; --f-right: #9c7a3a; --edge: rgba(70, 48, 12, .9); --grid: rgba(90, 62, 18, .55);
+  filter: drop-shadow(0 0 6px rgba(255, 230, 160, .9)) drop-shadow(0 0 22px rgba(240, 200, 110, .55)); animation: lit 3.2s ease-in-out infinite;
+}
+.gate h1 { margin: 0; font-weight: 700; font-size: clamp(44px, 14vw, 64px); line-height: .9; text-transform: uppercase; letter-spacing: .02em; text-shadow: 0 2px 18px rgba(0, 0, 0, .8), 0 0 40px rgba(240, 214, 138, .18); }
+.gate small { margin-top: -10px; font-family: var(--font-poster); font-weight: 600; font-size: clamp(18px, 5.4vw, 26px); line-height: 1; letter-spacing: .06em; text-transform: uppercase; }
+.gate label { font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
+.gate input { width: 100%; font: inherit; font-size: 16px; /* under 16px iOS zooms in on focus */ letter-spacing: .14em; text-transform: uppercase; color: var(--ink); background: rgba(0, 0, 0, .66); border: 2px solid var(--ink); border-radius: 14px; padding: 10px 12px; text-align: center; }
+.gate input:focus { outline: none; border-color: var(--neon); box-shadow: 0 0 14px rgba(109, 255, 149, .5); }
+.gate .unofficial { margin: 6px 0 0; font-size: 12px; letter-spacing: .06em; color: var(--muted); }
+.gate .err { min-height: 1.3em; margin: 0; font-size: 13px; letter-spacing: .06em; color: var(--fav); }
 .howto { display: grid; gap: 14px; padding: 20px 20px 22px; }
 .howto h2 { margin: 0; font-family: var(--font-poster); font-weight: 600; font-size: 34px; line-height: .9; text-transform: uppercase; }
 .howto ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; font-size: 16px; font-weight: 500; line-height: 1.35; }
@@ -295,12 +323,36 @@ footer summary.on { color: var(--neon); }
 }
 @media (min-width: 700px) { :root { --q: 26px; } }
 @media (prefers-reduced-motion: reduce) {
-  .slot .badge, .grid.in-l, .grid.in-r, .date[aria-pressed="true"] svg, .slot.fav::after { animation: none; }
+  .slot .badge, .grid.in-l, .grid.in-r, .date[aria-pressed="true"] svg, .slot.fav::after, .gate .cube { animation: none; }
   .slot, .date, .date svg { transition: none; }
 }
 </style>
 </head>
 <body>
+<div class="gate">
+  <form id="gateForm">
+    <svg class="cube" viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg>
+    <h1>Dystopia</h1>
+    <small>Saint-Étienne</small>
+    <label for="gatePw">Accès réservé</label>
+    <input id="gatePw" type="text" name="code" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="Code d'accès" required>
+    <button class="install" type="submit">Entrer</button>
+    <p class="err" id="gateErr" aria-live="polite"></p>
+    <p class="unofficial">Easy Timetable · timetable non officielle, sans lien avec l'organisateur</p>
+  </form>
+</div>
+<script>
+document.getElementById("gateForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const pw = document.getElementById("gatePw").value.trim().toUpperCase();
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
+  const hash = [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  if (hash !== GATE_HASH) { document.getElementById("gateErr").textContent = "Code incorrect"; return; }
+  try { localStorage.setItem(GATE_KEY, hash); } catch (err) {}
+  document.documentElement.classList.remove("locked");
+  window.scrollTo(0, 0);
+});
+</script>
 
 <div class="wrap">
   <header class="top">
