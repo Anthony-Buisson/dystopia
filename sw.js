@@ -1,5 +1,5 @@
 // Offline cache: network first so updates land, cached copy when the festival network is down.
-const CACHE = "dystopia-v6";
+const CACHE = "dystopia-v7";
 const ASSETS = ["./", "manifest.webmanifest", "bg.jpg", "fonts/oswald.woff2", "fonts/teko.woff2", "icons/icon-192.png", "icons/apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => {
