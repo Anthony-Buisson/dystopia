@@ -407,6 +407,12 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
 });
 </script>
 
+<!-- Outside .wrap, whose z-index would keep it under the opaque notch band (body::after) in the installed app -->
+<nav class="daystrip" id="daystrip" aria-label="Jours">
+  <button class="date mini" type="button" data-day="0" aria-pressed="true" aria-label="Jour 1, vendredi 5 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 1</b><span>Ven 05</span></span></button>
+  <button class="date mini" type="button" data-day="1" aria-pressed="false" aria-label="Jour 2, samedi 6 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 2</b><span>Sam 06</span></span></button>
+</nav>
+
 <div class="wrap">
   <header class="top">
     <button class="date" type="button" data-day="0" aria-pressed="true" aria-label="Jour 1, vendredi 5 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 1</b><span>Ven 05</span></span></button>
@@ -416,11 +422,6 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
     </div>
     <button class="date" type="button" data-day="1" aria-pressed="false" aria-label="Jour 2, samedi 6 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 2</b><span>Sam 06</span></span></button>
   </header>
-
-  <nav class="daystrip" id="daystrip" aria-label="Jours">
-    <button class="date mini" type="button" data-day="0" aria-pressed="true" aria-label="Jour 1, vendredi 5 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 1</b><span>Ven 05</span></span></button>
-    <button class="date mini" type="button" data-day="1" aria-pressed="false" aria-label="Jour 2, samedi 6 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 2</b><span>Sam 06</span></span></button>
-  </nav>
 
   <button class="install" id="install" type="button" hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
