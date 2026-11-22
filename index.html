@@ -118,6 +118,19 @@ body::after {
 .date:active { transform: scale(.95); }
 .date:focus-visible, .slot:focus-visible, .btn:focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
 
+/* Once the header has scrolled away: a thin fixed band with only the two days, at their normal size */
+.daystrip {
+  position: fixed; inset: 0 0 auto; z-index: 11; display: flex; justify-content: space-between; align-items: center;
+  padding: calc(6px + env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) 6px max(14px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--bg) 86%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line); box-shadow: 0 6px 20px rgba(0, 0, 0, .45);
+  transform: translateY(-110%); transition: transform .25s ease-out; pointer-events: none;
+}
+.daystrip.on { transform: none; pointer-events: auto; }
+.date.mini { width: auto; display: flex; align-items: center; gap: 9px; }
+.date.mini[data-day="1"] { flex-direction: row-reverse; }
+.date.mini .lab { text-align: left; }
+.date.mini[data-day="1"] .lab { text-align: right; }
 .daybar { display: grid; justify-items: center; gap: 4px; }
 .daybar h2 {
   margin: 0; font-family: var(--font-poster); font-weight: 600; text-transform: uppercase; text-align: center;
@@ -323,6 +336,7 @@ footer summary.on { color: var(--neon); }
 }
 @media (min-width: 700px) { :root { --q: 26px; } }
 @media (prefers-reduced-motion: reduce) {
+  .daystrip { transition: none; }
   .slot .badge, .grid.in-l, .grid.in-r, .date[aria-pressed="true"] svg, .slot.fav::after, .gate .cube { animation: none; }
   .slot, .date, .date svg { transition: none; }
 }
@@ -402,6 +416,11 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
     </div>
     <button class="date" type="button" data-day="1" aria-pressed="false" aria-label="Jour 2, samedi 6 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 2</b><span>Sam 06</span></span></button>
   </header>
+
+  <nav class="daystrip" id="daystrip" aria-label="Jours">
+    <button class="date mini" type="button" data-day="0" aria-pressed="true" aria-label="Jour 1, vendredi 5 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 1</b><span>Ven 05</span></span></button>
+    <button class="date mini" type="button" data-day="1" aria-pressed="false" aria-label="Jour 2, samedi 6 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 2</b><span>Sam 06</span></span></button>
+  </nav>
 
   <button class="install" id="install" type="button" hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
@@ -691,6 +710,16 @@ function userSetDay(d) {
   try { localStorage.setItem(HINT_KEY, "1"); } catch (e) {}
 }
 dateBtns.forEach(b => b.addEventListener("click", () => userSetDay(+b.dataset.day)));
+// The thin day band shows once the header with the day switch has scrolled out of view
+const strip = document.getElementById("daystrip");
+strip.querySelectorAll("button").forEach(b => { b.tabIndex = -1; });
+if ("IntersectionObserver" in window) {
+  new IntersectionObserver(([e]) => {
+    const on = !e.isIntersecting && e.boundingClientRect.top < 0;
+    strip.classList.toggle("on", on);
+    strip.querySelectorAll("button").forEach(b => { b.tabIndex = on ? 0 : -1; });
+  }).observe(document.querySelector(".top"));
+}
 try { if (localStorage.getItem(HINT_KEY)) document.getElementById("hint").hidden = true; } catch (e) {}
 (() => {
   const tt = document.getElementById("tt");
