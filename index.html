@@ -83,6 +83,15 @@ body::after {
 
 /* Title, flanked by the two golden cubes that switch the night */
 .top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; }
+/* The header sits on the same blurred band as the day band, edge to edge and up to the top of the screen */
+.top { position: relative; isolation: isolate; }
+.top::before {
+  content: ""; position: absolute; z-index: -1; left: 50%; width: 100vw; transform: translateX(-50%);
+  top: calc(-14px - env(safe-area-inset-top, 0px)); bottom: -34px; pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 35%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  /* no bottom line: the blur fades out over its last 28 px */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+}
 .title { text-align: center; user-select: none; min-width: 0; }
 .title h1 {
   margin: 0; font-weight: 700; text-transform: uppercase; line-height: .9;
@@ -118,15 +127,22 @@ body::after {
 .date:active { transform: scale(.95); }
 .date:focus-visible, .slot:focus-visible, .btn:focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
 
-/* Once the header has scrolled away: a thin fixed band with only the two days, at their normal size */
+/* Once the header has scrolled away: a thin fixed band with the two days and the festival's name, at their normal size */
 .daystrip {
   position: fixed; inset: 0 0 auto; z-index: 11; display: flex; justify-content: space-between; align-items: center;
   padding: calc(6px + env(safe-area-inset-top, 0px) + min(env(safe-area-inset-top, 0px), 18px)) max(14px, env(safe-area-inset-right, 0px)) 6px max(14px, env(safe-area-inset-left, 0px));
-  background: color-mix(in srgb, var(--bg) 86%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--line); box-shadow: 0 6px 20px rgba(0, 0, 0, .45);
+  background: color-mix(in srgb, var(--bg) 35%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
   transform: translateY(-110%); transition: transform .25s ease-out; pointer-events: none;
 }
 .daystrip.on { transform: none; pointer-events: auto; }
+/* No bottom line: the band reaches 24 px further down and its blur fades out there (only the buttons take taps) */
+.daystrip {
+  padding-bottom: 30px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+}
+.daystrip.on { pointer-events: none; }
+.daystrip.on button { pointer-events: auto; }
+.stripname { flex: 1; min-width: 0; padding: 0 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; text-transform: uppercase; line-height: 1; font-size: clamp(22px, 6.6vw, 40px); letter-spacing: .02em; text-shadow: 0 2px 14px rgba(0, 0, 0, .8), 0 0 30px rgba(240, 214, 138, .18); }
 .date.mini { width: auto; display: flex; align-items: center; gap: 9px; }
 .date.mini[data-day="1"] { flex-direction: row-reverse; }
 .date.mini .lab { text-align: left; }
@@ -410,6 +426,7 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
 <!-- Outside .wrap, whose z-index would keep it under the opaque notch band (body::after) in the installed app -->
 <nav class="daystrip" id="daystrip" aria-label="Jours">
   <button class="date mini" type="button" data-day="0" aria-pressed="true" aria-label="Jour 1, vendredi 5 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 1</b><span>Ven 05</span></span></button>
+  <span class="stripname" aria-hidden="true">Dystopia</span>
   <button class="date mini" type="button" data-day="1" aria-pressed="false" aria-label="Jour 2, samedi 6 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 2</b><span>Sam 06</span></span></button>
 </nav>
 
