@@ -121,8 +121,8 @@ body::after {
 /* Once the header has scrolled away: a thin fixed band with only the two days, at their normal size */
 .daystrip {
   position: fixed; inset: 0 0 auto; z-index: 11; display: flex; justify-content: space-between; align-items: center;
-  padding: calc(6px + env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) 6px max(14px, env(safe-area-inset-left, 0px));
-  background: var(--bg);   /* opaque: a blurred see-through band looked smudged under the status bar */
+  padding: calc(6px + env(safe-area-inset-top, 0px) + min(env(safe-area-inset-top, 0px), 18px)) max(14px, env(safe-area-inset-right, 0px)) 6px max(14px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--bg) 86%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line); box-shadow: 0 6px 20px rgba(0, 0, 0, .45);
   transform: translateY(-110%); transition: transform .25s ease-out; pointer-events: none;
 }
