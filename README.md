@@ -1,6 +1,6 @@
 # Dystopia Saint-Étienne · Timetable
 
-Timetable du festival Dystopia (5 et 6 décembre 2025, Saint-Étienne) : les scènes Techno et Hard Music de chaque nuit, les sets en cours, les favoris et les styles de chaque artiste, aux couleurs de l'affiche.
+Timetable du festival Dystopia (4 et 5 décembre 2026, Saint-Étienne) : les scènes Hard Music et Techno de chaque nuit, les sets en cours, les favoris et les styles de chaque artiste, aux couleurs de l'affiche.
 
 - Page statique, sans build : `index.html` contient le style, les données et le script.
 - Installable sur l'écran d'accueil et consultable hors ligne (`manifest.webmanifest`, `sw.js`).

@@ -6,7 +6,7 @@
 <title>Dystopia Timetable</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Timetable de Dystopia Saint-Étienne, vendredi 5 et samedi 6 décembre, avec les artistes en train de jouer.">
+<meta name="description" content="Timetable de Dystopia Saint-Étienne, vendredi 4 et samedi 5 décembre, avec les artistes en train de jouer.">
 <meta name="theme-color" content="#060a08">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -62,10 +62,11 @@ body {
   -webkit-tap-highlight-color: transparent;
   overflow-x: clip;
 }
-/* Jungle, neon wireframe ceiling and the cube's golden light, like the flyer. Fixed so the columns scroll over it. */
+/* The flyer's own backdrop (green planet, lake, jungle, golden pyramids), lightly dimmed for legibility.
+   Fixed so the columns scroll over it; sized on the large viewport so it does not jump when the address bar hides. */
 body::before {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background: url(bg.jpg) center top / cover no-repeat;
+  content: ""; position: fixed; inset: 0 0 auto; height: 100vh; height: 100lvh; pointer-events: none; z-index: 0;
+  background: linear-gradient(rgba(0, 0, 0, .22), rgba(0, 0, 0, .22)), url(bg.jpg) center top / cover no-repeat;
 }
 /* Opaque band behind the status bar so scrolled content never shows under the notch. */
 body::after {
@@ -170,6 +171,7 @@ body::after {
   text-align: center; padding: 5px 4px 2px; background: var(--ink); color: #050505;
   border: 2px solid var(--ink); border-bottom: 0; border-radius: 14px 14px 0 0;
   text-transform: uppercase; line-height: .85; min-width: 0; font-family: var(--font-poster);
+  display: flex; flex-direction: column; justify-content: center;
 }
 .head b { display: block; font-size: clamp(24px, 7vw, 38px); font-weight: 600; letter-spacing: .01em; overflow-wrap: anywhere; }
 .head span { display: block; font-size: clamp(12px, 3.3vw, 17px); font-weight: 600; letter-spacing: .03em; }
@@ -198,6 +200,7 @@ body::after {
 .slot.last { border-radius: 0 0 11px 11px; margin-bottom: 2px; }
 .slot .nm { font-family: var(--font-poster); font-weight: 600; font-size: clamp(17px, 4.9vw, 26px); line-height: .86; letter-spacing: .01em; overflow-wrap: anywhere; }
 .slot .nm small { font-size: .62em; font-weight: 500; }
+small.sub { display: block; margin-top: 2px; font-size: .55em !important; letter-spacing: .02em; }
 .slot .tm { font-family: var(--font-poster); font-size: clamp(12px, 3.3vw, 16px); font-weight: 500; line-height: 1; letter-spacing: .03em; font-variant-numeric: tabular-nums; opacity: .92; }
 .slot.past { opacity: .4; }
 .slot.now {
@@ -236,19 +239,24 @@ body::after {
 .slot.fav.past { box-shadow: none; }
 .slot.fav.past::after { padding: 2px; animation: none; background: var(--fav); }
 
-/* Sets already played, folded above the columns once every stage has moved past them */
-.past > summary {
-  margin-left: calc(var(--rail) + var(--gap)); list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 5px 10px 3px; border: 1.5px dashed rgba(244, 246, 244, .4); border-radius: 12px; background: rgba(0, 0, 0, .66);
-  font-family: var(--font-poster); font-size: 17px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
-}
+/* Sets already played, folded under the stage names inside each column's white frame */
+.past { margin-bottom: -8px; }
+.past > summary, .past-cols { display: grid; grid-template-columns: var(--rail) repeat(2, 1fr); column-gap: var(--gap); }
+.past > summary { list-style: none; cursor: pointer; }
 .past > summary::-webkit-details-marker { display: none; }
-.past > summary::before { content: "▸"; transition: transform .2s; font-size: 12px; }
-.past[open] > summary::before { transform: rotate(90deg); }
+.pcell, .past-col { min-width: 0; border: 2px solid var(--ink); border-width: 0 2px; background: rgba(0, 0, 0, .45); }
+.pcell:first-child, .past-col:first-child { grid-column: 2; }
+.pcell {
+  display: flex; align-items: center; justify-content: center; gap: 5px; padding: 6px 4px 3px;
+  font-family: var(--font-poster); font-size: clamp(13px, 3.8vw, 17px); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+  border-bottom: 1.5px dashed rgba(244, 246, 244, .4); background-clip: padding-box;
+}
+.pcell::before { content: "▸"; font-size: .75em; transition: transform .2s; }
+.past[open] .pcell { border-bottom: 0; }
+.past[open] .pcell::before { transform: rotate(90deg); }
+.pcell:empty::before { content: none; }
 .past > summary:focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
-.past-cols { display: grid; grid-template-columns: var(--rail) repeat(2, 1fr); column-gap: var(--gap); margin-top: 8px; }
-.past-col { display: grid; align-content: start; gap: 4px; min-width: 0; }
-.past-col:first-child { grid-column: 2; }
+.past-col { display: grid; align-content: start; gap: 4px; padding: 2px 4px 6px; border-bottom: 1.5px dashed rgba(244, 246, 244, .4); }
 .chip {
   display: grid; gap: 0; padding: 4px 5px 2px; min-width: 0; text-align: center; cursor: pointer;
   font: inherit; color: var(--ink); text-transform: uppercase; opacity: .6; font-family: var(--font-poster);
@@ -330,19 +338,13 @@ html.locked .gate ~ *, html.locked body > :not(.gate) { display: none !important
 .howto ol svg { width: 18px; height: 18px; vertical-align: -3px; }
 .howto p { margin: 0; font-size: 13px; color: var(--muted); }
 
-/* Footer: doors pill and the flyer's small print, then the tools */
+/* Footer: the flyer's closing-times pill */
 footer { display: grid; gap: 10px; justify-items: center; color: var(--muted); font-size: 12px; letter-spacing: .06em; text-align: center; }
 .doors {
   font-family: var(--font-poster); font-weight: 600; text-transform: uppercase; line-height: 1;
-  font-size: clamp(18px, 5.6vw, 30px); color: #050505; background: var(--ink); border-radius: 14px; padding: 7px 18px 3px; white-space: nowrap;
+  font-size: clamp(15px, 4.4vw, 26px); color: #050505; background: var(--ink); border-radius: 14px; padding: 7px 18px 3px; white-space: nowrap;
 }
 .doors small { font-size: 1em; text-transform: none; }
-.exit { color: var(--ink); font-size: 12px; letter-spacing: .32em; text-transform: uppercase; padding-left: .32em; }
-footer details { width: 100%; max-width: 440px; }
-footer summary { cursor: pointer; text-transform: uppercase; letter-spacing: .14em; }
-footer summary.on { color: var(--neon); }
-.simrow { display: flex; gap: 8px; justify-content: center; align-items: center; margin-top: 10px; flex-wrap: wrap; }
-.simrow input, .simrow select { font: inherit; font-size: 16px; color: var(--ink); background: #0d1510; border: 1px solid var(--line); padding: 6px 8px; border-radius: 4px; }
 [hidden], .sheet .members:empty, .tags:empty { display: none !important; }
 
 @media (max-width: 420px) {
@@ -425,19 +427,19 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
 
 <!-- Outside .wrap, whose z-index would keep it under the opaque notch band (body::after) in the installed app -->
 <nav class="daystrip" id="daystrip" aria-label="Jours">
-  <button class="date mini" type="button" data-day="0" aria-pressed="true" aria-label="Jour 1, vendredi 5 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 1</b><span>Ven 05</span></span></button>
+  <button class="date mini" type="button" data-day="0" aria-pressed="true" aria-label="Jour 1, vendredi 4 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 1</b><span>Ven 04</span></span></button>
   <span class="stripname" aria-hidden="true">Dystopia</span>
-  <button class="date mini" type="button" data-day="1" aria-pressed="false" aria-label="Jour 2, samedi 6 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 2</b><span>Sam 06</span></span></button>
+  <button class="date mini" type="button" data-day="1" aria-pressed="false" aria-label="Jour 2, samedi 5 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 2</b><span>Sam 05</span></span></button>
 </nav>
 
 <div class="wrap">
   <header class="top">
-    <button class="date" type="button" data-day="0" aria-pressed="true" aria-label="Jour 1, vendredi 5 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 1</b><span>Ven 05</span></span></button>
+    <button class="date" type="button" data-day="0" aria-pressed="true" aria-label="Jour 1, vendredi 4 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 1</b><span>Ven 04</span></span></button>
     <div class="title">
       <h1>Dystopia</h1>
       <small>Saint-Étienne</small>
     </div>
-    <button class="date" type="button" data-day="1" aria-pressed="false" aria-label="Jour 2, samedi 6 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 2</b><span>Sam 06</span></span></button>
+    <button class="date" type="button" data-day="1" aria-pressed="false" aria-label="Jour 2, samedi 5 décembre"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cube"/></svg><span class="lab"><b>Jour 2</b><span>Sam 05</span></span></button>
   </header>
 
   <button class="install" id="install" type="button" hidden>
@@ -445,38 +447,28 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
     Installer l'appli
   </button>
 
-  <section aria-label="Ouverture des portes" id="live" hidden></section>
+  <section aria-label="Début de la soirée" id="live" hidden></section>
 
   <section class="tt" id="tt" aria-labelledby="ttl">
     <div class="daybar">
-      <h2 id="ttl" aria-live="polite">Jour 1 : vendredi 5 décembre</h2>
+      <h2 id="ttl" aria-live="polite">Jour 1 : vendredi 4 décembre</h2>
       <div class="hint" id="hint">Touche un cube ou fais glisser la timetable pour changer de jour</div>
     </div>
+    <div class="heads" id="heads" aria-hidden="true"></div>
     <details class="past" id="past" hidden>
-      <summary id="pastLabel"></summary>
+      <summary id="pastLabel"><span class="pcell" data-col="0"></span><span class="pcell" data-col="1"></span></summary>
       <div class="past-cols">
         <div class="past-col" data-col="0"></div>
         <div class="past-col" data-col="1"></div>
       </div>
     </details>
-    <div class="heads" id="heads" aria-hidden="true"></div>
     <div class="grid" id="grid0"></div>
     <div class="grid" id="grid1" hidden></div>
   </section>
 
   <footer>
-    <div class="doors">Ouverture des portes : <small>18h00</small> - 4h00</div>
-    <div class="exit">Toute sortie est définitive</div>
+    <div class="doors">Fin des entrées à 2h30 - Arrêt du son à 4h</div>
     <div id="offline">Consultable hors ligne une fois installée.</div>
-    <details id="simbox">
-      <summary id="simLabel">Tester une autre heure</summary>
-      <div class="simrow">
-        <label for="simTime">Heure simulée</label>
-        <select id="simDay" aria-label="Nuit simulée"><option value="0">Vendredi</option><option value="1">Samedi</option></select>
-        <input id="simTime" type="time" step="60">
-        <button class="btn" id="simReset" type="button">Heure réelle</button>
-      </div>
-    </details>
   </footer>
 </div>
 
@@ -517,83 +509,99 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
 </svg>
 
 <script>
-// Timetables transcribed from the official flyers. Times are "HH:MM"; slots past midnight belong to the same night.
+// Timetables transcribed from the official 2026 flyers. Times are "HH:MM"; slots past midnight belong to the same night.
 // The festival has no artist pages: tags come from artist bios on labels, festival sites, Resident Advisor, Wikipedia
 // and the hard music press. Acts without a reliable source get none.
 const DAYS = [
-  { label: "Vendredi", date: 5, start: new Date(2025, 11, 5, 18, 0), stages: ["Techno", "Hard Music"] },
-  { label: "Samedi", date: 6, start: new Date(2025, 11, 6, 18, 0), stages: ["Techno", "Hard Music"] }
+  { label: "Vendredi", date: 4, start: new Date(2026, 11, 4, 18, 15), stages: ["Hard Music", "Techno"], hosts: ["Tha Watcher", ""] },
+  { label: "Samedi", date: 5, start: new Date(2026, 11, 5, 18, 15), stages: ["Hard Music", "Techno"], hosts: ["Villain", ""] }
 ];
+// Second line printed under the name on the flyer.
+const SUBS = {
+  "Slaughterhouse": "by N-Vitral & Deadly Guns",
+  "Vertile [Live]": "Everything Changes",
+  "Omnya": "Carnage Frozen Veins",
+  "Sickmode & Krowdexx": "presents Noisemakers"
+};
 const ARTISTS = {
-  "M4ze Pusher": { tags: ["Techno", "Progressive House", "Trance"], members: "Alias techno d'Angerfist" },
-  "Sköne": { tags: ["Hard Techno", "Acidcore", "Hard Dance", "Tekno"] },
-  "Oguz": { tags: ["Hard Techno"] },
-  "Carv": { tags: ["Hard Techno"] },
-  "Omaks": { tags: ["Hard Techno", "Reverse Bass", "Bounce", "Groove"] },
-  "Vieze Asbak": { tags: ["Hard Techno", "Memetechno"] },
-  "Unfused": { tags: ["Hardcore"] },
-  "Ophidian": { tags: ["Hardcore"] },
-  "Anime": { tags: ["Hardcore", "Uptempo", "Hardstyle", "Gabber"] },
-  "Angerfist [Live]": { tags: ["Hardcore"] },
-  "Hysta": { tags: ["Hardcore", "Frenchcore", "Uptempo", "Gabber"] },
-  "N-Vitral": { tags: ["Hardcore", "Industrial Hardcore"] },
-  "Gezellige Uptempo": { tags: ["Uptempo", "Hardcore", "Frenchcore"] },
-  "Major Conspiracy": { tags: ["Uptempo", "Frenchcore"] },
-  "Lunakorpz vs Amigo": { tags: ["Uptempo", "Hardcore", "Frenchcore"] },
-  "Cryogenic": { tags: ["Uptempo", "Hardcore"] },
-  "Drokz vs Akira": { tags: ["Terror", "Speedcore", "Gabber"] },
-  "Suerte": { tags: ["Techno", "Hard Techno", "Hard Trance"] },
-  "Vladimir Cauchemar": { tags: ["Trap", "Hip-Hop", "French House"] },
-  "Area One": { tags: ["Hard Techno", "Acid Techno", "Neorave"] },
-  "KX CHR": { tags: ["Hard Techno", "Hardstyle", "Bass Music"] },
-  "Eczodia": { tags: ["Hard Techno", "Hardcore Techno", "Trance"] },
-  "Jay Reeve": { tags: ["Hardstyle", "Euphoric Hardstyle"] },
-  "Devin Wild": { tags: ["Hardstyle", "Hard Techno", "Drum & Bass"] },
-  "Technoboy & Tuneboy": { tags: ["Hardstyle", "Reverse Bass"], members: "Le duo TNT" },
-  "Sub Zero Project": { tags: ["Hardstyle", "Euphoric Hardstyle", "Raw Hardstyle"] },
-  "Dual Damage": { tags: ["Raw Hardstyle"] },
-  "The Straikerz": { tags: ["Raw Hardstyle"] },
-  "Adjuzt": { tags: ["Raw Hardstyle"] },
-  "Krowdexx vs Toza": { tags: ["Raw Hardstyle"] }
+  "Chaos Project": { tags: ["Hardcore"] },
+  "The Masochist": { tags: ["Hardcore"] },
+  "Catscan vs Negative A": { tags: ["Hardcore", "Industrial Hardcore", "Darkcore"] },
+  "DJ The Prophet": { tags: ["Hardstyle", "Hardcore"] },
+  "Korsakoff vs Predator": { tags: ["Hardcore", "Gabber", "Drum & Bass"] },
+  "Dr. Peacock": { tags: ["Frenchcore"] },
+  "Slaughterhouse": { tags: ["Hardcore", "Uptempo"], members: "Deadly Guns & N-Vitral" },
+  "Partyraiser vs Spitnoise": { tags: ["Hardcore", "Uptempo"] },
+  "Mind Compressor vs The Dope Doctor": { tags: ["Hardcore", "Uptempo"] },
+  "MBK vs Chaotic Hostility": { tags: ["Uptempo", "Terror"], members: "Styles de MBK ; Chaotic Hostility sans source fiable" },
+  "Unicorn on K": { tags: ["Uptempo", "Terror"] },
+  "Uphoria": { tags: ["Hard Techno", "Industrial Techno"] },
+  "Teksa": { tags: ["Acidcore", "Mentalcore"] },
+  "Billx": { tags: ["Hardtek", "Frenchcore", "Psytrance"] },
+  "6EJOU": { tags: ["Hard Techno", "Industrial Techno"], members: "Lyon · fondateur du label Industrial Violence" },
+  "Lessss": { tags: ["Hard Techno", "Schranz", "Industrial Techno"] },
+  "Karah": { tags: ["Hard Techno", "Industrial Techno"] },
+  "Todiefor": { tags: ["Hard Techno", "Techno", "Bass Music", "Rap"] },
+  "Zelecter": { tags: ["Hardstyle", "Classic Hardstyle"] },
+  "Max Enforcer": { tags: ["Hardstyle"] },
+  "Sound Rush": { tags: ["Hardstyle"], members: "Les jumeaux Jeroen et Martijn Boeren" },
+  "D-Block & S-te-Fan": { tags: ["Hardstyle"], members: "Duo Diederik Bakker et Stefan den Daas" },
+  "Vertile [Live]": { tags: ["Hardstyle"], members: "Live « Everything Changes » : chant en direct et musiciens sur scène" },
+  "The Saints": { tags: ["Hardstyle", "Raw Hardstyle", "Euphoric Hardstyle"] },
+  "Deluzion": { tags: ["Hardstyle", "Raw Hardstyle"] },
+  "Omnya": { tags: ["Raw Hardstyle"] },
+  "Chapter V vs Faceless": { tags: ["Hardstyle", "Raw Hardstyle"] },
+  "Sickmode & Krowdexx": { tags: ["Raw Hardstyle", "Hardstyle"], members: "Noisemakers, projet commun de Sickmode et Krowdexx" },
+  "Fraw pres. Super Nova [Live]": { tags: ["Hardstyle", "Raw Hardstyle"] },
+  "Lekkerfaces": { tags: ["Uptempo", "Hardcore"] },
+  "Dikke Baap": { tags: ["Techno", "Memetechno"] },
+  "CLTX": { tags: ["Hard Techno", "Industrial Techno"] },
+  "Marie Vaunt": { tags: ["Techno", "Acid Techno"] },
+  "Azyr": { tags: ["Hard Techno", "Schranz", "Hard Dance"] },
+  "Creeds": { tags: ["Hard Techno", "Hard Dance"] },
+  "Poltergst": { tags: ["Hard Techno"] }
 };
 // [night, stage column, name, start, end]
 const SLOTS = [
-  [0, 0, "Nesak vs Bckyrd", "18:15", "19:30"],
-  [0, 0, "M4ze Pusher", "19:30", "20:30"],
-  [0, 0, "Sköne", "20:30", "22:00"],
-  [0, 0, "Oguz", "22:00", "23:30"],
-  [0, 0, "Carv", "23:30", "01:00"],
-  [0, 0, "Omaks", "01:00", "02:30"],
-  [0, 0, "Vieze Asbak", "02:30", "04:00"],
-  [0, 1, "Raven", "18:15", "19:00"],
-  [0, 1, "Unfused", "19:00", "19:45"],
-  [0, 1, "Ophidian", "19:45", "20:30"],
-  [0, 1, "Anime", "20:30", "21:30"],
-  [0, 1, "Angerfist [Live]", "21:30", "22:15"],
-  [0, 1, "Hysta", "22:15", "23:15"],
-  [0, 1, "N-Vitral", "23:15", "00:15"],
-  [0, 1, "Gezellige Uptempo", "00:15", "01:00"],
-  [0, 1, "Major Conspiracy", "01:00", "02:00"],
-  [0, 1, "Lunakorpz vs Amigo", "02:00", "02:45"],
-  [0, 1, "Cryogenic", "02:45", "03:30"],
-  [0, 1, "Drokz vs Akira", "03:30", "04:00"],
-  [1, 0, "Suerte", "18:15", "19:15"],
-  [1, 0, "Acidpach", "19:15", "20:30"],
-  [1, 0, "Vladimir Cauchemar", "20:30", "22:00"],
-  [1, 0, "Area One", "22:00", "23:30"],
-  [1, 0, "KX CHR", "23:30", "01:00"],
-  [1, 0, "Eczodia", "01:00", "02:30"],
-  [1, 0, "Hades", "02:30", "04:00"],
-  [1, 1, "Vinstylerz", "18:15", "19:00"],
-  [1, 1, "Jay Reeve", "19:00", "20:00"],
-  [1, 1, "Devin Wild", "20:00", "21:00"],
-  [1, 1, "Technoboy & Tuneboy", "21:00", "22:15"],
-  [1, 1, "Sub Zero Project", "22:15", "23:15"],
-  [1, 1, "Dual Damage", "23:15", "00:00"],
-  [1, 1, "The Straikerz", "00:00", "01:15"],
-  [1, 1, "Adjuzt", "01:15", "02:15"],
-  [1, 1, "Krowdexx vs Toza", "02:15", "03:15"],
-  [1, 1, "Strike Blood vs Insuspect", "03:15", "04:00"]
+  [0, 0, "Chaos Project", "18:15", "19:00"],
+  [0, 0, "The Masochist", "19:00", "19:45"],
+  [0, 0, "Catscan vs Negative A", "19:45", "20:30"],
+  [0, 0, "DJ The Prophet", "20:30", "21:30"],
+  [0, 0, "Korsakoff vs Predator", "21:30", "22:15"],
+  [0, 0, "Dr. Peacock", "22:15", "23:15"],
+  [0, 0, "Slaughterhouse", "23:15", "00:00"],
+  [0, 0, "Partyraiser vs Spitnoise", "00:00", "00:45"],
+  [0, 0, "Mind Compressor vs The Dope Doctor", "00:45", "01:30"],
+  [0, 0, "99PRBLMZ", "01:30", "02:15"],
+  [0, 0, "Dr.Z", "02:15", "02:45"],
+  [0, 0, "MBK vs Chaotic Hostility", "02:45", "03:15"],
+  [0, 0, "Unicorn on K", "03:15", "04:00"],
+  [0, 1, "Uphoria", "18:15", "19:30"],
+  [0, 1, "Teksa", "19:30", "21:00"],
+  [0, 1, "Billx", "21:00", "22:00"],
+  [0, 1, "6EJOU", "22:00", "23:30"],
+  [0, 1, "Lessss", "23:30", "01:00"],
+  [0, 1, "Karah", "01:00", "02:30"],
+  [0, 1, "Todiefor", "02:30", "04:00"],
+  [1, 0, "Zelecter", "18:15", "19:00"],
+  [1, 0, "Max Enforcer", "19:00", "20:00"],
+  [1, 0, "Sound Rush", "20:00", "21:00"],
+  [1, 0, "D-Block & S-te-Fan", "21:00", "22:00"],
+  [1, 0, "Vertile [Live]", "22:00", "23:15"],
+  [1, 0, "The Saints", "23:15", "00:00"],
+  [1, 0, "Deluzion", "00:00", "00:30"],
+  [1, 0, "Omnya", "00:30", "01:00"],
+  [1, 0, "Chapter V vs Faceless", "01:00", "01:45"],
+  [1, 0, "Sickmode & Krowdexx", "01:45", "02:30"],
+  [1, 0, "Fraw pres. Super Nova [Live]", "02:30", "03:15"],
+  [1, 0, "Lekkerfaces", "03:15", "04:00"],
+  [1, 1, "EVN", "18:15", "19:15"],
+  [1, 1, "Dikke Baap", "19:15", "20:30"],
+  [1, 1, "CLTX", "20:30", "22:00"],
+  [1, 1, "Marie Vaunt", "22:00", "23:30"],
+  [1, 1, "Azyr", "23:30", "01:00"],
+  [1, 1, "Creeds", "01:00", "02:30"],
+  [1, 1, "Poltergst", "02:30", "04:00"]
 ];
 
 const GRID_START = 18 * 60;         // 18h00
@@ -605,15 +613,17 @@ const offset = hhmm => { const [h, m] = hhmm.split(":").map(Number); return ((h 
 const fmt = hhmm => hhmm.replace(":", "h");
 const slots = SLOTS.map(([day, col, name, start, end], i) => ({ id: i, day, col, name, start, end, s: offset(start), e: offset(end) }));
 const dayEnd = DAYS.map((_, d) => Math.max(...slots.filter(s => s.day === d).map(s => s.e)));
-// "Drokz vs Akira" -> vs in small caps; "[Live]" as a smaller suffix, like the flyer.
-const nameHTML = name => name.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]))
-  .replace(/ vs /g, " <small>vs</small> ").replace(/ (\[[^\]]+\])/, " <small>$1</small>");
+// "Korsakoff vs Predator" -> vs in small caps; "pres." and "[Live]" smaller, and the flyer's second line (SUBS) below the name.
+const esc = s => s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const nameHTML = name => esc(name)
+  .replace(/ vs /g, " <small>vs</small> ").replace(/ pres\. /g, " <small>pres.</small> ").replace(/ (\[[^\]]+\])/, " <small>$1</small>")
+  + (SUBS[name] ? ` <small class="sub">${esc(SUBS[name])}</small>` : "");
 
-// --- time source: the device clock, or a night + time picked in the footer to try the page ---
-let simulated = null;
-const nowDate = () => simulated || new Date();
-const minutesInto = (day, date) => (date - DAYS[day].start) / 60000;
-const liveDay = date => DAYS.findIndex((_, d) => { const m = minutesInto(d, date); return m >= 0 && m < dayEnd[d]; });
+// --- time source: the device clock ---
+const nowDate = () => new Date();
+// Minutes since 18h00 of that night (the grid origin); the night itself starts at DAYS[].start (18h15).
+const minutesInto = (day, date) => { const base = new Date(DAYS[day].start); base.setHours(18, 0, 0, 0); return (date - base) / 60000; };
+const liveDay = date => DAYS.findIndex((d, i) => { const m = minutesInto(i, date); return m >= minutesInto(i, d.start) && m < dayEnd[i]; });
 const status = (slot, m) => m >= slot.e ? "past" : m >= slot.s ? "now" : "next";
 
 function untilText(mins) {
@@ -693,7 +703,9 @@ function renderPast() {
   const list = slots.filter(s => s.day === selected && s.s < cut);
   pastEl.hidden = !list.length;
   if (!list.length) { pastEl.open = false; return; }
-  document.getElementById("pastLabel").textContent = `${list.length} set${list.length > 1 ? "s" : ""} déjà joué${list.length > 1 ? "s" : ""}`;
+  const plural = n => `${n} set${n > 1 ? "s" : ""} joué${n > 1 ? "s" : ""}`;
+  document.getElementById("pastLabel").setAttribute("aria-label", `${list.length} set${list.length > 1 ? "s" : ""} déjà joué${list.length > 1 ? "s" : ""}`);
+  pastEl.querySelectorAll(".pcell").forEach(el => { const n = list.filter(s => s.col === +el.dataset.col).length; el.textContent = n ? plural(n) : ""; });
   pastEl.querySelectorAll(".past-col").forEach(colEl => {
     colEl.replaceChildren(...list.filter(s => s.col === +colEl.dataset.col).map(s => {
       const b = document.createElement("button");
@@ -719,7 +731,7 @@ function setDay(d, animate) {
   if (animate) { void grids[d].offsetWidth; grids[d].classList.add(dir); }
   dateBtns.forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.day === d)));
   document.getElementById("ttl").textContent = `Jour ${d + 1} : ${DAYS[d].label.toLowerCase()} ${DAYS[d].date} décembre`;
-  heads.innerHTML = DAYS[d].stages.map((n, c) => `<div class="head" data-col="${c}"><b>${n}</b><span>Début à 18h15</span></div>`).join("");
+  heads.innerHTML = DAYS[d].stages.map((n, c) => `<div class="head" data-col="${c}"><b>${n}</b>${DAYS[d].hosts[c] ? `<span>Hosted by ${DAYS[d].hosts[c]}</span>` : ""}</div>`).join("");
   renderPast();
 }
 function userSetDay(d) {
@@ -753,10 +765,10 @@ try { if (localStorage.getItem(HINT_KEY)) document.getElementById("hint").hidden
   }, { passive: true });
 })();
 // Friday until Saturday noon, Saturday afterwards; a running night always wins.
-const defaultDay = date => { const l = liveDay(date); return l !== -1 ? l : date < new Date(2025, 11, 6, 12, 0) ? 0 : 1; };
+const defaultDay = date => { const l = liveDay(date); return l !== -1 ? l : date < new Date(2026, 11, 5, 12, 0) ? 0 : 1; };
 
 // --- favourites, kept on this device only ---
-const FAV_KEY = "dystopia-favoris";
+const FAV_KEY = "dystopia-favoris-2026";
 const favKey = s => `${s.day}:${s.col}:${s.name}`;
 let favs = new Set();
 try { favs = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || "[]")); } catch (e) {}
@@ -806,12 +818,12 @@ function render() {
   if (ld !== -1) { liveEl.dataset.next = ""; liveEl.innerHTML = ""; return; }
   const next = DAYS.findIndex(d => d.start > date);
   if (next === -1) {
-    liveEl.innerHTML = `<div class="offhours"><span class="k">Dystopia 2025, c'est fini</span><b class="countdown" style="font-size:28px">Merci les ravers&nbsp;!</b></div>`;
+    liveEl.innerHTML = `<div class="offhours"><span class="k">Dystopia 2026, c'est fini</span><b class="countdown" style="font-size:28px">Merci les ravers&nbsp;!</b></div>`;
     return;
   }
   if (!document.getElementById("countdown") || liveEl.dataset.next !== String(next)) {
     liveEl.dataset.next = next;
-    liveEl.innerHTML = `<div class="offhours"><span class="k">Ouverture des portes dans</span><b class="countdown" id="countdown" role="timer"></b></div>`;
+    liveEl.innerHTML = `<div class="offhours"><span class="k">Début dans</span><b class="countdown" id="countdown" role="timer"></b></div>`;
   }
   tickCountdown();
 }
@@ -861,26 +873,6 @@ function openArtist(s) {
   if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
 }
 dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
-
-// --- time simulation (footer) ---
-const simDay = document.getElementById("simDay");
-const simInput = document.getElementById("simTime");
-const simLabel = document.getElementById("simLabel");
-function setSim() {
-  const v = simInput.value;
-  if (v) {
-    const d = +simDay.value, [h, m] = v.split(":").map(Number);
-    simulated = new Date(DAYS[d].start);
-    simulated.setHours(h, m, 0, 0);
-    if (h < 12) simulated.setDate(simulated.getDate() + 1);
-  } else simulated = null;
-  simLabel.textContent = simulated ? `Heure simulée : ${DAYS[+simDay.value].label.toLowerCase()} ${fmt(v)}` : "Tester une autre heure";
-  simLabel.classList.toggle("on", !!simulated);
-  render();
-}
-simInput.addEventListener("input", setSim);
-simDay.addEventListener("change", setSim);
-document.getElementById("simReset").addEventListener("click", () => { simInput.value = ""; setSim(); });
 
 buildGrid(0);
 buildGrid(1);
