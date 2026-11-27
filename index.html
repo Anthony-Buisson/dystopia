@@ -270,6 +270,90 @@ small.sub { display: block; margin-top: 2px; font-size: .55em !important; letter
 .nowline { position: absolute; left: calc(var(--rail) - 6px); right: 0; height: 0; border-top: 2px solid var(--neon); z-index: 3; pointer-events: none; box-shadow: 0 0 10px var(--neon); }
 .nowline::before { content: ""; position: absolute; left: -5px; top: -6px; width: 10px; height: 10px; border-radius: 50%; background: var(--neon); }
 
+/* Timetable / Plan switch: the flyer's white frame, the shown view filled white like the stage heads */
+.views {
+  justify-self: center; width: min(250px, 72vw); display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px;
+  background: rgba(0, 0, 0, .6); border: 2px solid var(--ink); border-radius: 999px; box-shadow: 0 4px 18px rgba(0, 0, 0, .5);
+}
+.view {
+  padding: 6px 10px 2px; border: 0; border-radius: 999px; background: none; cursor: pointer;
+  font-family: var(--font-poster); font-size: 20px; font-weight: 600; letter-spacing: .08em; line-height: 1; text-transform: uppercase; color: var(--muted);
+}
+.view[aria-pressed="true"] { background: var(--ink); color: #050505; }
+.view:focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
+
+/* Plan: the Parc Expo's ground floor, wider than the phone, panned with a finger and zoomed with the buttons */
+.planv { display: grid; gap: 12px; }
+.planv[hidden] { display: none; }
+.planhint { text-align: center; font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+.mapwrap { position: relative; }
+.mapbox {
+  position: relative; height: min(118vw, 70vh); overflow: auto; overscroll-behavior: contain; scrollbar-width: none; touch-action: pan-x pan-y;
+  border: 2px solid var(--ink); border-radius: 14px; background: rgba(3, 7, 5, .9); box-shadow: 0 10px 30px rgba(0, 0, 0, .5); cursor: grab;
+}
+.mapbox::-webkit-scrollbar { display: none; }
+.mapbox.dragging { cursor: grabbing; }
+.mapin { position: relative; width: 160%; }
+.mapin > svg { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; }
+.mapin text { font-family: var(--font-poster); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; fill: var(--ink); pointer-events: none; }
+.mapin .sub { font-weight: 500; letter-spacing: .1em; fill: var(--neon); }
+.mapin .lbl { font-weight: 500; fill: var(--muted); letter-spacing: .08em; }
+.mapin .hall { cursor: pointer; }
+.mapin .hall .shape { fill: color-mix(in srgb, var(--c0-deep) 45%, #040806); stroke: transparent; stroke-width: 3; stroke-linejoin: round; transition: fill .2s; }
+.mapin .hall:hover .shape, .mapin .hall:focus-visible .shape { fill: color-mix(in srgb, var(--c0-deep) 80%, #040806); }
+.mapin .hall:focus-visible { outline: none; }
+.mapin .hall:focus-visible .shape { stroke: var(--neon); stroke-width: 4; }
+.mapin .hall.live .shape { fill: color-mix(in srgb, var(--c0-deep) 85%, #040806); stroke: var(--neon); filter: drop-shadow(0 0 10px var(--neon)); }
+.mapbox.filtering .hall, .mapbox.filtering .scenery { opacity: .5; }
+/* Services: round icon buttons that keep their size whatever the zoom */
+.mk {
+  position: absolute; z-index: 2; width: var(--mk, 28px); height: var(--mk, 28px); transform: translate(-50%, -50%); padding: 0; display: grid; place-items: center;
+  font: inherit; font-size: 11px; font-weight: 600; letter-spacing: 0; color: var(--ink); cursor: pointer;
+  background: #06100a; border: 1.5px solid var(--ink); border-radius: 50%; box-shadow: 0 2px 6px rgba(0, 0, 0, .7);
+  transition: opacity .2s, background .2s, border-color .2s;
+}
+.mk svg, .amen i svg { width: 16px; height: 16px; }
+.mapin.far .mk { font-size: 9px; }
+.mapin.far .mk svg { width: 12px; height: 12px; }
+.mapin.far .mpill { font-size: 13px; max-width: 34%; }
+.mapbox.filtering .mk { opacity: .28; }
+.mapbox.filtering .mk.on { opacity: 1; }
+/* A service already drawn on the map (first-aid post): picked in the legend, the drawing itself lights up, square, at its own size */
+.mk.ghost { width: 3.61%; height: 2.95%; padding: 0; border-radius: 3px; border: 1.5px solid rgba(244, 246, 244, .55); background: #0b0f0d; box-shadow: none; }
+.mk.ghost svg, .mapin.far .mk.ghost svg { width: 82%; height: 82%; }
+.mk.ghost:not(.on) { opacity: 0 !important; pointer-events: none; }
+.mk.ghost.on { background: #0b0f0d; border-color: var(--gold); box-shadow: 0 0 0 2px rgba(240, 214, 138, .45), 0 0 16px 4px rgba(240, 214, 138, .75); }
+.mk.on { z-index: 3; background: var(--gold); border-color: #fff4d6; color: #1d1404; box-shadow: 0 0 0 3px rgba(240, 214, 138, .35), 0 0 16px 3px rgba(240, 214, 138, .7); }
+.mk:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.mpill {
+  position: absolute; transform: translate(-50%, -50%); max-width: 30%; z-index: 4; display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 7px 0 5px; border: 1.5px solid var(--neon); border-radius: 6px; cursor: pointer; white-space: nowrap; overflow: hidden;
+  font: inherit; font-family: var(--font-poster); font-size: 16px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; line-height: 1;
+  color: var(--ink); background: color-mix(in srgb, var(--c0-deep) 70%, #000); box-shadow: 0 0 12px color-mix(in srgb, var(--neon) 60%, transparent);
+}
+.mpill::before { content: "EN DIRECT"; flex: none; margin-top: -3px; font-family: var(--font-ui); font-size: 7.5px; font-weight: 600; letter-spacing: .1em; padding: 2px 3px 1px; background: var(--neon); color: #03200d; border-radius: 2px; }
+.mpill span { overflow: hidden; text-overflow: ellipsis; }
+/* Zoom buttons, outside the scrolling area so they stay put */
+.zoombar { position: absolute; top: 8px; right: 8px; z-index: 5; display: grid; gap: 6px; }
+.zoombar button {
+  width: 38px; height: 38px; display: grid; place-items: center; padding: 0; cursor: pointer;
+  font: inherit; font-family: var(--font-poster); font-size: 28px; font-weight: 600; line-height: 1; color: #050505;
+  background: var(--ink); border: 0; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, .6);
+}
+.zoombar button:disabled { opacity: .35; cursor: default; }
+.zoombar button:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+.mapcap { margin: 0; min-height: 1.3em; text-align: center; font-size: 14px; letter-spacing: .04em; color: var(--ink); }
+.legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.amen {
+  display: flex; align-items: center; gap: 8px; padding: 5px 10px 5px 5px; min-width: 0; text-align: left; cursor: pointer;
+  font: inherit; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink);
+  background: rgba(0, 0, 0, .6); border: 1px solid var(--line); border-radius: 10px;
+}
+.amen i { flex: none; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid var(--ink); font-style: normal; font-size: 11px; font-weight: 600; background: #06100a; }
+.amen[aria-pressed="true"] { border-color: var(--gold); box-shadow: 0 0 12px rgba(240, 214, 138, .35); }
+.amen[aria-pressed="true"] i { background: var(--gold); border-color: #fff4d6; color: #1d1404; }
+.amen:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
 /* Dialog */
 dialog {
   border: 2px solid var(--ink); padding: 0; color: var(--ink); background: #070c09;
@@ -449,6 +533,11 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
 
   <section aria-label="Début de la soirée" id="live" hidden></section>
 
+  <nav class="views" aria-label="Affichage">
+    <button class="view" type="button" data-view="tt" aria-pressed="true">Timetable</button>
+    <button class="view" type="button" data-view="plan" aria-pressed="false">Plan</button>
+  </nav>
+
   <section class="tt" id="tt" aria-labelledby="ttl">
     <div class="daybar">
       <h2 id="ttl" aria-live="polite">Jour 1 : vendredi 4 décembre</h2>
@@ -464,6 +553,82 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
     </details>
     <div class="grid" id="grid0"></div>
     <div class="grid" id="grid1" hidden></div>
+  </section>
+
+  <section class="planv" id="planv" aria-labelledby="planTitle" hidden>
+    <div class="daybar"><h2 id="planTitle">Plan du Parc Expo</h2></div>
+    <div class="planhint">Glisse pour te déplacer · touche un hall pour voir qui y joue</div>
+    <div class="mapwrap">
+      <div class="mapbox" id="mapbox">
+        <div class="mapin" id="mapin">
+          <svg viewBox="0 0 720 880" role="img" aria-label="Plan du rez-de-chaussée du Parc Expo : le Hall A (Hard Music) en haut avec son bar le long de la scène, le Hall B (Techno) en bas avec son bar sous la scène, tables et lockers à gauche, stands RDR, tattoo et massage le long du mur et sortie vers les toilettes en bas ; entre les deux halls, le hall d'accueil côté parkings avec la recharge cashless dans son renfoncement, et la cour intérieure avec les stands de nourriture, le bar et l'espace repas ; deux parkings à gauche">
+            <g class="scenery">
+              <g fill="rgba(244,246,244,.04)" stroke="rgba(244,246,244,.35)" stroke-width="1.5" stroke-dasharray="6 5">
+                <rect x="28" y="110" width="132" height="370" rx="16"/>
+                <rect x="38" y="540" width="180" height="250" rx="16"/>
+              </g>
+              <path d="M28 140 h34 M126 140 h34 M28 162 h34 M126 162 h34 M28 184 h34 M126 184 h34 M28 206 h34 M126 206 h34 M28 228 h34 M126 228 h34 M28 250 h34 M126 250 h34 M28 272 h34 M126 272 h34 M28 294 h34 M126 294 h34 M28 316 h34 M126 316 h34 M28 338 h34 M126 338 h34 M28 360 h34 M126 360 h34 M28 382 h34 M126 382 h34 M28 404 h34 M126 404 h34 M28 426 h34 M126 426 h34 M28 448 h34 M126 448 h34 M38 566 h34 M126 566 h34 M38 588 h34 M126 588 h34 M38 610 h34 M126 610 h34 M38 632 h34 M126 632 h34 M38 654 h34 M126 654 h34 M38 676 h34 M126 676 h34 M38 698 h34 M126 698 h34 M38 720 h34 M126 720 h34 M38 742 h34 M126 742 h34 M38 764 h34 M126 764 h34" stroke="rgba(244,246,244,.16)" stroke-width="1.5"/>
+              <text x="94" y="303" text-anchor="middle" font-size="26">Parking</text>
+              <text x="128" y="673" text-anchor="middle" font-size="26">Parking</text>
+              <!-- halls' walls; the stage areas inside them are the touchable parts -->
+              <g fill="rgba(63,208,106,.07)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round">
+                <path d="M250 40 H517 V290 H650 V330 H250 Z"/>
+                <path d="M250 480 H650 V742 H360 V830 H250 Z"/>
+              </g>
+              <!-- entrance hall, with the recess by Hall A where the cashless top-up stand is -->
+              <path d="M250 330 H400 V480 H250 Z" fill="rgba(244,246,244,.08)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
+              <!-- main entrance, like the venue's own signs: white glass doors, a white door-and-arrow icon and "Entrée / Sortie" stacked -->
+              <path d="M250 370 V450" stroke="var(--ink)" stroke-width="7"/>
+              <g fill="none" stroke="var(--ink)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M226 396 h10 v28 h-10"/>
+                <path d="M200 410 h28 M219 401 l9 9 -9 9"/>
+              </g>
+              <text x="194" y="406" text-anchor="end" font-size="21">Entrée</text>
+              <text x="194" y="426" text-anchor="end" font-size="21">Sortie</text>
+              <text x="325" y="420" text-anchor="middle" font-size="20">Hall</text>
+              <text x="325" y="440" text-anchor="middle" font-size="20">d'accueil</text>
+              <!-- inner yard: food stands in a square, bar and tables on the far side -->
+              <rect x="400" y="330" width="250" height="150" fill="rgba(63,208,106,.06)" stroke="var(--ink)" stroke-width="3"/>
+              <g fill="rgba(240,214,138,.25)" stroke="var(--gold)" stroke-width="1.2"><rect x="445" y="374" width="18" height="12" rx="2"/><rect x="445" y="399" width="18" height="12" rx="2"/><rect x="445" y="424" width="18" height="12" rx="2"/><rect x="458" y="361" width="18" height="12" rx="2"/><rect x="458" y="437" width="18" height="12" rx="2"/><rect x="483" y="361" width="18" height="12" rx="2"/><rect x="483" y="437" width="18" height="12" rx="2"/><rect x="508" y="361" width="18" height="12" rx="2"/><rect x="508" y="437" width="18" height="12" rx="2"/><rect x="521" y="374" width="18" height="12" rx="2"/><rect x="521" y="399" width="18" height="12" rx="2"/><rect x="521" y="424" width="18" height="12" rx="2"/></g>
+              <g fill="rgba(244,246,244,.12)" stroke="rgba(244,246,244,.5)" stroke-width="1"><rect x="574" y="350" width="18" height="10" rx="2"/><rect x="574" y="372" width="18" height="10" rx="2"/><rect x="574" y="428" width="18" height="10" rx="2"/><rect x="574" y="450" width="18" height="10" rx="2"/></g>
+              <!-- Hall B, left side: tables, lockers, more tables; stands along the wall, exit to the toilets in the bottom wall -->
+              <g fill="rgba(244,246,244,.12)" stroke="rgba(244,246,244,.5)" stroke-width="1"><rect x="270" y="500" width="18" height="10" rx="2"/><rect x="322" y="500" width="18" height="10" rx="2"/><rect x="270" y="546" width="18" height="10" rx="2"/><rect x="322" y="546" width="18" height="10" rx="2"/><rect x="270" y="680" width="18" height="10" rx="2"/><rect x="322" y="680" width="18" height="10" rx="2"/><rect x="270" y="724" width="18" height="10" rx="2"/><rect x="322" y="724" width="18" height="10" rx="2"/></g>
+              <g fill="#0b1a10" stroke="rgba(244,246,244,.55)" stroke-width="1.5"><rect x="262" y="578" width="11" height="80" rx="1.5"/><rect x="278" y="578" width="11" height="80" rx="1.5"/><rect x="294" y="578" width="11" height="80" rx="1.5"/><rect x="310" y="578" width="11" height="80" rx="1.5"/><rect x="326" y="578" width="11" height="80" rx="1.5"/><rect x="342" y="578" width="11" height="80" rx="1.5"/></g>
+              <g fill="rgba(240,214,138,.15)" stroke="rgba(240,214,138,.7)" stroke-width="1.2" stroke-dasharray="3 2"><rect x="280" y="804" width="11" height="22" rx="2"/><rect x="338" y="752" width="16" height="22" rx="2"/><rect x="338" y="780" width="16" height="22" rx="2"/><rect x="338" y="808" width="16" height="22" rx="2"/></g>
+              <!-- first-aid post (Croix-Rouge), drawn like the venue's signs: dark box, white square, red cross -->
+              <rect x="253" y="801" width="25" height="25" rx="3" fill="#0b0f0d" stroke="rgba(244,246,244,.55)" stroke-width="1.5"/>
+              <rect x="258" y="806" width="15" height="15" rx="1" fill="var(--ink)"/>
+              <path d="M263.5 809 h4 v3.5 h3.5 v4 h-3.5 v3.5 h-4 v-3.5 h-3.5 v-4 h3.5 z" fill="#e63946"/>
+              <!-- openings: Hall A / entrance hall, entrance hall / yard, entrance hall / Hall B, Hall A's corridor / yard, yard / Hall B -->
+              <g stroke="#121813" stroke-width="5">
+                <path d="M326 330 H366"/>
+                <path d="M400 392 V432"/>
+                <path d="M346 480 H388"/>
+                <path d="M528 330 H568"/>
+                <path d="M528 480 H568"/>
+                <path d="M294 830 H321"/>
+              </g>
+            </g>
+            <g class="hall" data-col="0" tabindex="0" role="button" aria-label="Hall A, scène Hard Music : voir qui y joue">
+              <rect class="shape" x="257" y="46" width="219" height="218" rx="4"/>
+              <text x="366" y="128" text-anchor="middle" font-size="40">Hall A</text>
+              <text class="sub" x="366" y="152" text-anchor="middle" font-size="18">Hard Music</text>
+            </g>
+            <g class="hall" data-col="1" tabindex="0" role="button" aria-label="Hall B, scène Techno : voir qui y joue">
+              <rect class="shape" x="427" y="488" width="218" height="218" rx="4"/>
+              <text x="536" y="588" text-anchor="middle" font-size="40">Hall B</text>
+              <text class="sub" x="536" y="612" text-anchor="middle" font-size="18">Techno</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="zoombar">
+        <button type="button" id="zoomIn" aria-label="Agrandir le plan">+</button>
+        <button type="button" id="zoomOut" aria-label="Réduire le plan">−</button>
+      </div>
+    </div>
+    <p class="mapcap" id="mapCap" aria-live="polite"></p>
+    <div class="legend" id="legend"></div>
   </section>
 
   <footer>
@@ -505,6 +670,15 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
       <path stroke="var(--edge)" stroke-width="2.4" stroke-linejoin="round" fill="none" d="M50 8 88 30V74L50 96 12 74V30ZM12 30 50 52 88 30M50 52V96"/>
     </symbol>
     <path id="star" d="M12 1.8l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.9l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9Z"/>
+    <symbol id="i-bar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h11v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z M16 11h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2 M8.5 12v6 M12.5 12v6 M4.5 9a2.5 2.5 0 0 1 3-3.4 3 3 0 0 1 5-.6 2.5 2.5 0 0 1 4 4"/></symbol>
+    <symbol id="i-food" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a2 2 0 0 0 4 0V3 M8 10v11 M17 21V3c-2.5 1.5-3.5 4-3.5 7.5V13H17"/></symbol>
+    <symbol id="i-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18 M7 9v11 M17 9v11 M3 14h4 M17 14h4 M3 14v6 M21 14v6"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-stand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l2-5h14l2 5z M3 9c0 1.7 1.3 2.5 3 2.5S9 10.7 9 9c0 1.7 1.3 2.5 3 2.5s3-.8 3-2.5c0 1.7 1.3 2.5 3 2.5S21 10.7 21 9 M5 11.5V20h14v-8.5"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18 M7 15h4"/></symbol>
+    <symbol id="i-aid" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="#f4f6f4"/><path d="M10 6h4v4h4v4h-4v4h-4v-4H6v-4h4z" fill="#e63946"/></symbol>
+    <symbol id="i-photo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+    <symbol id="i-in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h11 M10 8l4 4-4 4 M14 4h6v16h-6"/></symbol>
   </defs>
 </svg>
 
@@ -733,6 +907,7 @@ function setDay(d, animate) {
   document.getElementById("ttl").textContent = `Jour ${d + 1} : ${DAYS[d].label.toLowerCase()} ${DAYS[d].date} décembre`;
   heads.innerHTML = DAYS[d].stages.map((n, c) => `<div class="head" data-col="${c}"><b>${n}</b>${DAYS[d].hosts[c] ? `<span>Hosted by ${DAYS[d].hosts[c]}</span>` : ""}</div>`).join("");
   renderPast();
+  if (view === "plan") renderPlan();
 }
 function userSetDay(d) {
   setDay(d, true);
@@ -813,6 +988,7 @@ function render() {
     if (!line.hidden) line.style.top = ((m - cut) / (SPAN - cut) * 100) + "%";
   });
   renderPast();
+  if (view === "plan") renderPlan();
 
   liveEl.hidden = ld !== -1;
   if (ld !== -1) { liveEl.dataset.next = ""; liveEl.innerHTML = ""; return; }
@@ -841,6 +1017,190 @@ function tickCountdown() {
   const d = Math.floor(secs / 86400);
   el.innerHTML = (d ? `${d}<small>j</small> ` : "") + `${pad(Math.floor(secs / 3600) % 24)}:${pad(Math.floor(secs / 60) % 60)}:${pad(secs % 60)}`;
 }
+
+// --- plan: the Parc Expo's ground floor; halls open what plays there, services light up from the legend ---
+var view = "tt";
+const MAP_W = 720, MAP_H = 880;
+const ICON = id => `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#${id}"/></svg>`;
+// Stage column -> hall: Hard Music in Hall A, Techno in Hall B
+const HALLS = ["Hall A", "Hall B"];
+// [label, icon (symbol id or short text), positions in the map's 720 x 860 frame]
+const AMENITIES = [
+  ["Bars", ICON("i-bar"), [[500, 102], [500, 167], [500, 232], [470, 724], [526, 724], [582, 724], [627, 381], [627, 429]]],
+  ["Restauration", ICON("i-food"), [[492, 405]]],
+  ["Tables", ICON("i-table"), [[583, 405], [305, 528], [305, 707]]],
+  ["Toilettes", "WC", [[490, 310], [272, 352], [307, 858]]],
+  ["Recharge cashless", ICON("i-card"), [[383, 346]]],
+  ["Photobooth", ICON("i-photo"), [[383, 388]]],
+  ["Lockers", ICON("i-lock"), [[307, 618]]],
+  ["RDR, tattoo, massage", ICON("i-stand"), [[315, 791]]],
+  // drawn on the map already: its icon only shows when picked in the legend
+  ["Poste de secours", ICON("i-aid"), [[265.5, 813.5]], "ghost"],
+  ["Parking", "P", [[94, 255], [128, 625]]],
+];
+const PILLS = [[356, 196], [536, 654]];
+const mapbox = document.getElementById("mapbox"), mapin = document.getElementById("mapin");
+const mapCap = document.getElementById("mapCap"), legendEl = document.getElementById("legend");
+const pos = (x, y) => `left:${(x / MAP_W * 100).toFixed(2)}%;top:${(y / MAP_H * 100).toFixed(2)}%`;
+let amenity = -1;
+function setAmenity(i) {
+  amenity = amenity === i ? -1 : i;
+  mapin.querySelectorAll(".mk").forEach(b => b.classList.toggle("on", +b.dataset.a === amenity));
+  legendEl.querySelectorAll(".amen").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.a === amenity)));
+  mapbox.classList.toggle("filtering", amenity !== -1);
+  if (amenity === -1) { mapCap.textContent = ""; return; }
+  const [label, , pts] = AMENITIES[amenity];
+  mapCap.textContent = pts.length > 1 ? `${label} · ${pts.length} sur le site` : label;
+  // bring the first one into view if it is off screen
+  const b = mapin.querySelector(`.mk[data-a="${amenity}"]`);
+  const x = b.offsetLeft, y = b.offsetTop;
+  if (x < mapbox.scrollLeft + 20 || x > mapbox.scrollLeft + mapbox.clientWidth - 20 || y < mapbox.scrollTop + 20 || y > mapbox.scrollTop + mapbox.clientHeight - 20)
+    mapbox.scrollTo({ left: x - mapbox.clientWidth / 2, top: y - mapbox.clientHeight / 2, behavior: "smooth" });
+}
+(function buildPlan() {
+  const frag = document.createDocumentFragment();
+  AMENITIES.forEach(([label, icon, pts], i) => {
+    pts.forEach(([x, y]) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = AMENITIES[i][3] ? "mk ghost" : "mk"; b.dataset.a = i; b.style.cssText = pos(x, y);
+      b.innerHTML = icon;
+      b.setAttribute("aria-label", label);
+      b.addEventListener("click", () => setAmenity(i));
+      frag.append(b);
+    });
+    const c = document.createElement("button");
+    c.type = "button"; c.className = "amen"; c.dataset.a = i; c.setAttribute("aria-pressed", "false");
+    c.innerHTML = `<i aria-hidden="true">${icon}</i><span>${label}</span>`;
+    c.addEventListener("click", () => setAmenity(i));
+    legendEl.append(c);
+  });
+  PILLS.forEach(([x, y], c) => {
+    const p = document.createElement("button");
+    p.type = "button"; p.className = "mpill"; p.dataset.col = c; p.hidden = true; p.style.cssText = pos(x, y);
+    frag.append(p);
+  });
+  mapin.append(frag);
+  mapin.querySelectorAll(".hall").forEach(g => {
+    const c = +g.dataset.col;
+    g.addEventListener("click", () => openStage(c));
+    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openStage(c); } });
+  });
+})();
+
+// Zoom: the map's width is 1x to 3.2x the frame. Buttons step through fixed levels; two fingers pinch freely.
+// Only the map zooms: the page itself keeps its scale (touch-action on the frame, and the pinch handled here).
+const ZOOMS = [1, 1.6, 2.4, 3.2], ZMIN = ZOOMS[0], ZMAX = ZOOMS.at(-1);
+let zoom = 1.6, mapCentred = false;
+const zoomIn = document.getElementById("zoomIn"), zoomOut = document.getElementById("zoomOut");
+// z: new zoom; (fx, fy): point of the map (0-1) to keep under (ax, ay), a point of the frame in px (default: its centre)
+function setZoom(z, fx, fy, ax = mapbox.clientWidth / 2, ay = mapbox.clientHeight / 2) {
+  if (fx === undefined) {
+    fx = (mapbox.scrollLeft + ax) / mapin.offsetWidth;
+    fy = (mapbox.scrollTop + ay) / mapin.offsetHeight;
+  }
+  zoom = Math.max(ZMIN, Math.min(ZMAX, z));
+  mapin.style.width = zoom * 100 + "%";
+  mapin.style.setProperty("--mk", zoom < 1.3 ? "21px" : "28px"); // smaller icons when the whole site is in view
+  mapin.classList.toggle("far", zoom < 1.3);
+  mapbox.scrollLeft = fx * mapin.offsetWidth - ax;
+  mapbox.scrollTop = fy * mapin.offsetHeight - ay;
+  zoomIn.disabled = zoom >= ZMAX - .01;
+  zoomOut.disabled = zoom <= ZMIN + .01;
+}
+zoomIn.addEventListener("click", () => setZoom(ZOOMS.find(z => z > zoom + .05) ?? ZMAX));
+zoomOut.addEventListener("click", () => setZoom([...ZOOMS].reverse().find(z => z < zoom - .05) ?? ZMIN));
+// Pinch with two fingers: the point between the fingers stays under them, and moving both fingers pans
+(() => {
+  let pinch = null, pinchEnd = 0;
+  const mid = t => { const r = mapbox.getBoundingClientRect(); return [(t[0].clientX + t[1].clientX) / 2 - r.left, (t[0].clientY + t[1].clientY) / 2 - r.top]; };
+  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  mapbox.addEventListener("touchstart", e => {
+    if (e.touches.length !== 2) return;
+    const [mx, my] = mid(e.touches);
+    pinch = { d: dist(e.touches), z: zoom, fx: (mapbox.scrollLeft + mx) / mapin.offsetWidth, fy: (mapbox.scrollTop + my) / mapin.offsetHeight };
+  }, { passive: true });
+  mapbox.addEventListener("touchmove", e => {
+    if (!pinch || e.touches.length !== 2) return;
+    e.preventDefault(); // keep the page from zooming or scrolling
+    const [mx, my] = mid(e.touches);
+    setZoom(pinch.z * dist(e.touches) / pinch.d, pinch.fx, pinch.fy, mx, my);
+  }, { passive: false });
+  const end = e => {
+    if (!pinch || e.touches.length >= 2) return;
+    pinch = null;
+    pinchEnd = Date.now();
+  };
+  // the lifted fingers must not count as a tap on a hall or an icon
+  mapbox.addEventListener("click", ev => { if (Date.now() - pinchEnd < 400) { ev.stopPropagation(); ev.preventDefault(); } }, { capture: true });
+  mapbox.addEventListener("touchend", end);
+  mapbox.addEventListener("touchcancel", end);
+  // Safari's own pinch gestures on the frame would zoom the page
+  ["gesturestart", "gesturechange", "gestureend"].forEach(t => mapbox.addEventListener(t, e => e.preventDefault(), { passive: false }));
+})();
+// Ctrl + wheel (trackpad pinch on a computer) zooms the map too
+mapbox.addEventListener("wheel", e => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+  const r = mapbox.getBoundingClientRect();
+  setZoom(zoom * Math.exp(-e.deltaY / 200), undefined, undefined, e.clientX - r.left, e.clientY - r.top);
+}, { passive: false });
+// With a mouse, drag to pan (fingers already scroll the frame); a drag never counts as a tap
+(() => {
+  let drag = null;
+  mapbox.addEventListener("pointerdown", e => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    drag = { x: e.clientX, y: e.clientY, l: mapbox.scrollLeft, t: mapbox.scrollTop, moved: false };
+  });
+  window.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.moved && Math.hypot(dx, dy) < 5) return;
+    drag.moved = true; mapbox.classList.add("dragging");
+    mapbox.scrollLeft = drag.l - dx; mapbox.scrollTop = drag.t - dy;
+  });
+  window.addEventListener("pointerup", () => {
+    if (drag && drag.moved) mapbox.addEventListener("click", e => { e.stopPropagation(); e.preventDefault(); }, { capture: true, once: true });
+    drag = null; mapbox.classList.remove("dragging");
+  });
+})();
+
+// What a hall has for the night shown: the set playing now, else the next one, else the last one
+function stageState(day, col, m) {
+  const list = slots.filter(s => s.day === day && s.col === col);
+  return { now: list.find(s => m >= s.s && m < s.e), next: list.find(s => s.s > m), last: list.at(-1) };
+}
+function openStage(c) {
+  const st = stageState(selected, c, minutesInto(selected, nowDate()));
+  openArtist(st.now || st.next || st.last);
+}
+function renderPlan() {
+  const date = nowDate(), m = minutesInto(selected, date), live = liveDay(date) === selected;
+  DAYS[selected].stages.forEach((stage, c) => {
+    const st = stageState(selected, c, m), on = live && !!st.now;
+    mapin.querySelector(`.hall[data-col="${c}"]`).classList.toggle("live", on);
+    const pill = mapin.querySelector(`.mpill[data-col="${c}"]`);
+    pill.hidden = !on;
+    if (on) {
+      pill.innerHTML = `<span>${esc(st.now.name.replace(/ \[[^\]]+\]/, ""))}</span>`;
+      pill.onclick = () => openArtist(st.now);
+      pill.setAttribute("aria-label", `${HALLS[c]}, ${stage} : ${st.now.name}, encore ${untilText(st.now.e - m)}`);
+    }
+  });
+  // first time the plan is on screen: start zoomed in, centred on the entrance hall and the yard
+  if (!mapCentred && mapbox.clientWidth) { mapCentred = true; setZoom(1.6, .46, .47); }
+}
+
+// --- Timetable / Plan switch (#plan opens the plan directly) ---
+const ttEl = document.getElementById("tt"), planEl = document.getElementById("planv");
+const viewBtns = [...document.querySelectorAll(".view")];
+function setView(v) {
+  view = v;
+  ttEl.hidden = v !== "tt"; planEl.hidden = v !== "plan";
+  viewBtns.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+  history.replaceState(null, "", v === "plan" ? "#plan" : location.pathname + location.search);
+  if (v === "plan") renderPlan();
+}
+viewBtns.forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
 
 // --- artist sheet ---
 const dlg = document.getElementById("dlg");
@@ -877,6 +1237,7 @@ dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
 buildGrid(0);
 buildGrid(1);
 setDay(defaultDay(nowDate()), false);
+if (location.hash === "#plan") setView("plan");
 render();
 setInterval(render, 20000);
 setInterval(tickCountdown, 1000);
